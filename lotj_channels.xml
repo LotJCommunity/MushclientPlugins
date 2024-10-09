@@ -51,10 +51,11 @@ USAGE:
   
   <trigger enabled="n" name="immchat" match="( IMM | CHAT )*" regexp="n" omit_from_output="n" script="untagged_info" sequence="100" />
   <trigger enabled="n" name="rpcchat" match="(R|P|C)*" regexp="n" omit_from_output="n" script="untagged_info" sequence="100" />
-  <trigger enabled="n" name="ooc" match="(OOC) *" regexp="n" omit_from_output="n" script="untagged_info" sequence="100" />
-  <trigger enabled="n" name="newbie" match="(NEWBIE) *" regexp="n" omit_from_output="n" script="untagged_info" sequence="100" />
-  <trigger enabled="n" name="immooc" match="(IMM) *" regexp="n" omit_from_output="n" script="untagged_info" sequence="100" />
-  <trigger enabled="n" name="rpcooc" match="(RPC) *" regexp="n" omit_from_output="n" script="untagged_info" sequence="100" />
+  <trigger enabled="n" name="ooc" match="(OOC) *:*" regexp="n" omit_from_output="n" script="untagged_info" sequence="100" />
+  <trigger enabled="n" name="newbie" match="(NEWBIE) *:*" regexp="n" omit_from_output="n" script="untagged_info" sequence="100" />
+  <trigger enabled="n" name="osay" match="(OSAY) *" regexp="n" omit_from_output="n" script="untagged_info" sequence="100" />
+  <trigger enabled="n" name="immooc" match="(IMM) *:*" regexp="n" omit_from_output="n" script="untagged_info" sequence="100" />
+  <trigger enabled="n" name="rpcooc" match="(RPC) *:*" regexp="n" omit_from_output="n" script="untagged_info" sequence="100" />
   <trigger enabled="n" name="immnet" match="ImmNet[*]*" regexp="n" omit_from_output="n" script="untagged_info" sequence="100" />
   <trigger enabled="n" name="councilnet" match="CouncilNet[*]*" regexp="n" omit_from_output="n" script="untagged_info" sequence="100" />
   
@@ -122,7 +123,7 @@ lineEnd = ""
 WINDOW_LINES = ""
 WINDOW_NAME = GetVariable("WINDOW_NAME") or "Communication Log"
 
--- functions for handling Aardwolf color codes
+-- functions for handling LotJ color codes
 dofile(GetPluginInfo(GetPluginID(), 20) .. "lotj_colors.lua")
 
 font_height = ""
@@ -170,6 +171,7 @@ SetTriggerOption("immchat", "enabled", show_immchat)
 SetTriggerOption("rpcchat", "enabled", show_rpcchat)
 SetTriggerOption("ooc", "enabled", show_ooc)
 SetTriggerOption("newbie", "enabled", show_newbie)
+SetTriggerOption("osay", "enabled", show_ooc)
 SetTriggerOption("immooc", "enabled", show_ooc)
 SetTriggerOption("rpcooc", "enabled", show_ooc)
 SetTriggerOption("immnet", "enabled", show_immnet)
@@ -188,6 +190,7 @@ SetTriggerOption("ooc", "omit_from_output", ooc_echo)
 SetTriggerOption("immooc", "omit_from_output", ooc_echo)
 SetTriggerOption("rpcooc", "omit_from_output", ooc_echo)
 SetTriggerOption("newbie", "omit_from_output", newbie_echo)
+SetTriggerOption("osay", "omit_from_output", ooc_echo)
 SetTriggerOption("immchat", "omit_from_output", immchat_echo)
 SetTriggerOption("rpcchat", "omit_from_output", rpcchat_echo)
 SetTriggerOption("immnet", "omit_from_output", immnet_echo)
@@ -812,7 +815,7 @@ end
 
 -- Takes input as a string with embedded LotJ color codes. Use via CallPlugin().
 -- See:   http://mushclient.com/scripts/doc.php?function=CallPlugin
--- You can use the function StylesToColoursOneLine(styles_table) from aardwolf_colors.lua
+-- You can use the function StylesToColoursOneLine(styles_table) from lotj_colors.lua
 -- or manually embed your own colors to push any colorized line you want to the log window.
 -- Example: CallPlugin("b555825a4a5700c35fa80780","storeFromOutside","HELLO&RHello&Mhello&x215hello&x66HELLO")
 function storeFromOutside(string)
@@ -836,7 +839,7 @@ function untagged_info (name, line, wildcards, styles)
   if rpcchat_echo == 1 and name=="rpcchat" then
   EnableTrigger("end_gag", true)  
   end
-  if ooc_echo == 1 and (name=="ooc" or name=="immooc" or name=="rpcooc") then
+  if ooc_echo == 1 and (name=="ooc" or name=="immooc" or name=="rpcooc" or name=="osay") then
   EnableTrigger("end_gag", true)
   end
   if newbie_echo == 1 and name=="newbie" then
@@ -1336,7 +1339,8 @@ function right_click_menu (hotspot_id)
       	end
       	EnableTrigger("immooc", 0 == show_ooc)
       	EnableTrigger("rpcooc", 0 == show_ooc)
-      	EnableTrigger("ooc", 0 == show_ooc)
+        EnableTrigger("ooc", 0 == show_ooc)
+        EnableTrigger("osay", 0 == show_ooc)
       	show_ooc = GetTriggerOption("ooc","enabled")
       elseif numResult == 17+hyperlink_skip then
       	if show_newbie == 0 then
@@ -1435,6 +1439,7 @@ function right_click_menu (hotspot_id)
         SetTriggerOption("ooc", "omit_from_output", 0 == ooc_echo)
         SetTriggerOption("immooc", "omit_from_output", 0 == ooc_echo)
         SetTriggerOption("rpcooc", "omit_from_output", 0 == ooc_echo)
+        SetTriggerOption("osay", "omit_from_output", 0 == ooc_echo)
         ooc_echo = GetTriggerOption("ooc", "omit_from_output")
       elseif numResult == 28+hyperlink_skip then
         if newbie_echo == 0 then
